@@ -1,10 +1,9 @@
 #include <SoftwareSerial.h>
 
-SoftwareSerial mySerial(10, 11); // RX, TX of arduino
+SoftwareSerial mySerial(10, 11); // Rx, Tx of Arduino
 
 void setup()
 {
-  //Serial.begin(9600);
   pinMode(2,INPUT);
   pinMode(8,INPUT);
   pinMode(9,INPUT);
@@ -31,36 +30,32 @@ float data=0;
 float temp;
 int distance()
 {
-  Serial.println(nof_pulses * 5.44);
+  Serial.println(nof_pulses * 5.44); //Least count of the position encoder used = 5.44
   
   while (Serial.available() >= 0) 
-  {
-        
+  {     
         data = (nof_pulses * 5.44);
-        
-//        if(a==0)
-//        {
-//              mySerial.print(data);  
-//        }
-        
         break;
   }
-  
-  //mySerial.print(data);
   initValue = digitalRead(2);
 }
 
 
+"""
+This function takes in the value corresponding to the distance covered 
+and compares it with the value entered by the user.
+Produces a beeping sound in the buzzer if the two values are equal
+i.e The required distance has been covered.
+"""
+
 int distance2(float check)
 {
 
-  Serial.println("hi");
   Serial.println(nof_pulses * 5.44);
   float val=nof_pulses * 5.44;
   
   if(val>=check)
   {
-    //buzzerbeep
     Serial.println("reached");
     Serial.println("buzzerbeep");
     tone(12,440);
@@ -68,26 +63,19 @@ int distance2(float check)
     tone(12,880);
     delay(1000);
     noTone(12);
-    //digitalWrite(8,LOW);
-    //digitalWrite(9,HIGH);
     return 1;
   }
-    
   initValue = digitalRead(2);
   return 0;
-
 }
 
 
 void loop()
 {
     nof_pulses=0;
-
-    //Serial.println("helooooooooo");
     String s = "";
-    if (mySerial.available()) 
+    if (mySerial.available()) //Checking connection with the Bluetooth module
     {
-      Serial.println("byeeeeeeeeee");
       
       char c;
       while((c = mySerial.read()))
@@ -101,24 +89,29 @@ void loop()
 
       Serial.println("Received: " + s);
 
-      if(s.toInt()==2)
+      """
+      Selecting Application 2 :
+      The device would receive user input for the length to be measured.
+      The buzzer present would produce a temporary beeping sound after the entered length was covered.
+      
+      """
+      
+      if(s.toInt()==2) 
       {
 
         Serial.println("in app 2");
-        //APPLICATION 2
-        String tomeasure="";
+        String tomeasure = "";
         int ch1;
         delay(20000);
-        tone(12,440);
+        tone(12,440); //beeping sound to indicate beginning of measurement
         delay(500);
-        noTone(12);
+        noTone(12); 
         
         
         if (mySerial.available()) 
         {
           
           Serial.println("getting data");
-          //String tomeasure = "";
           int ch;
           int cnt=0;
           while((ch = mySerial.read())) 
@@ -141,23 +134,20 @@ void loop()
         }
 
         Serial.println("gotwhat tomeasure");
-        Serial.println(tomeasure);
-        Serial.println(ch1);
         
-        float final=tomeasure.toInt()+ch1*255+ch1;
+        float final=tomeasure.toInt()+ch1*255+ch1; // Mapping the value received by the position encoder to actual distance traversed
         Serial.println(final);
         int res=0;
         while(res!=1)
         {
 
-              while((currValue = digitalRead(2)) == initValue) {
+              while((currValue = digitalRead(2)) == initValue) 
                 delay(5);
-              }
-              while((currValue = digitalRead(2)) != initValue) {
+              
+              while((currValue = digitalRead(2)) != initValue) 
                 delay(5);
-              }
               ++nof_pulses;
-              res=distance2(final);
+              res=distance2(final); 
         }
 
 
@@ -168,22 +158,11 @@ void loop()
       }
     }
     
+}
 
 
-
-
-
-
-
-
-
-
-
-
-      
-
-      if(s.toInt()==1)
-      {
+       if(s.toInt()==1)
+       {
             //APPLICATION 1
             
             Serial.println("in app 1");
